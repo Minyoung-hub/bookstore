@@ -1,0 +1,333 @@
+<%@page import="leehyun.book.user.domain.User"%>
+<%@page import="leehyun.book.user.service.UserServiceImpl"%>
+<%@page import="leehyun.book.user.service.UserService"%>
+<%@ page import="leehyun.book.img.service.ImgService"%>
+<%@ page import="leehyun.book.img.service.ImgServiceImpl"%>
+<%@ page import="leehyun.book.img.domain.Img"%>
+<%@ page language='java' contentType='text/html; charset=UTF-8'
+	pageEncoding='UTF-8'%>
+<%@ taglib prefix='c' uri='http://java.sun.com/jsp/jstl/core'%>
+<%@ page import='java.util.*'%>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<title>북적북적</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+	function alert_correct() {
+		swal({
+			title : "수정하시겠습니까?",
+			text : "회원 정보가 수정됩니다.",
+			type : "warning",
+			showCancelButton : true,
+			cancelButtonText : "아니오",
+			confirmButtonText : "예",
+			closeOnConfirm : false
+		}, function alert_correct() {
+			swal({
+				title : "수정 성공",
+				type : "success",
+				showCancelButton : false,
+				cancelButtonText : "",
+				confirmButtonText : "확인",
+				closeOnConfirm : true
+			}, function(isConfirm) {
+				if (isConfirm) {
+					document.userInfo.submit();
+				}
+			});
+		});
+	}
+
+	function alert_secede() {
+		swal({
+			title : "탈퇴하시겠습니까?",
+			text : "회원 정보가 삭제됩니다.",
+			type : "warning",
+			showCancelButton : true,
+			cancelButtonText : "아니오",
+			confirmButtonText : "예",
+			closeOnConfirm : false
+		}, function alert_secede() {
+			swal({
+				title : "탈퇴 성공",
+				type : "success",
+				showCancelButton : false,
+				cancelButtonText : "",
+				confirmButtonText : "확인",
+				closeOnConfirm : true
+			}, function(isConfirm) {
+				if (isConfirm) {
+					location.href = "userDelProc.jsp";
+				}
+			});
+		});
+	}
+</script>
+<style>
+label, p {
+	font-size: large;
+}
+
+.logoimg {
+	color: #2f5597;
+	background-color: white;
+	width: 600px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 50px;
+}
+
+.welcome {
+	display: inline;
+}
+
+.div_top {
+	margin-top: 10px;
+	color: black;
+	height: 20px;
+	float: right;
+}
+
+.div_logo {
+	height: 180px;
+	text-align: center;
+}
+
+.search_bar {
+	height: 70px;
+	background-color: #2f5597;
+	text-align: center;
+}
+
+.search_label {
+	color: white;
+	margin: 10px;
+	margin-top: 14px;
+	margin-left: 30px;
+	font-size: x-large;
+}
+
+.search_input {
+	width: 40%;
+	height: 40px;
+	color: black;
+}
+
+.search_btn {
+	margin-left: 2%;
+	margin-bottom: 4px;
+	width: 80px;
+	height: 40px;
+}
+
+.footer {
+	text-align: center;
+	height: 100px;
+	margin-top: 20px;
+	padding-top: 20px;
+}
+
+.footertext {
+	font-size: small;
+}
+
+hr {
+	border: solid 0.8px #2f5597;
+}
+
+.tab {
+	text-align: center;
+	font-size: 15px;
+}
+
+.name {
+	text-align: center;
+	font-weight: 700;
+}
+</style>
+</head>
+<body>
+<%
+	request.setCharacterEncoding("utf-8");
+	ImgService imgService = new ImgServiceImpl();
+	Img img = imgService.findImg(1);
+%>
+	<div class="container">
+		<div class="div_top">
+		
+			<%
+				if (session.getAttribute("sessionID") == null) {
+			%>
+			<a href="loginIn.jsp">로그인</a> / <a href="addUserIn.jsp">회원가입</a> /
+			<%
+				} else {
+			%>
+			<h5 class="welcome">${sessionID} 님, 환영합니다 ! &nbsp;&nbsp;/</h5>
+			<a href="logoutProc.jsp">로그아웃</a> /
+			<%
+				}
+
+				UserService userService = new UserServiceImpl();
+				User user = userService.findUser((int) session.getAttribute("sessionUserNum"));
+				String bday = user.getBirthday().substring(0, 11);
+			%>
+			<a href="userInfo.jsp">마이페이지</a> / <a href="../order/cartOut.jsp">장바구니</a>
+		</div>
+	</div>
+	<div class="div_logo">
+		<div class="logoimg">
+			<a href='../main.jsp' style="text-decoration: none;"><img src='../img/<%=img.getImgUrl()%>' width="450"></a>
+		</div>
+	</div>
+	<!-- 메인 검색창 -->
+	<div class="search_bar">
+		<form class="search_form" action="../book/search.jsp">
+			<label class="search_label">도서검색&nbsp;</label> <input
+				class="search_input" type="text" name="search_words" required />
+			<button class="search_btn btn btn-default" type="submit">
+				<span class="glyphicon glyphicon-search">&nbsp;</span>검색
+			</button>
+		</form>
+	</div>
+
+	<!-- 메인 nav Bar -->
+	<br>
+	<div class='container'>
+		<ul class='tab nav nav-tabs nav-justified'>
+			<li class='active' style="font-weight: bold;"><a
+				href='userInfo.jsp'><span class="glyphicon glyphicon-user"></span>
+					회원정보</a></li>
+			<li><a href='../order/cartOut.jsp'><span
+					class="glyphicon glyphicon-shopping-cart"></span> 장바구니</a></li>
+			<li><a href='../order/orderOut.jsp'><span
+					class="glyphicon glyphicon-list"></span> 주문내역</a></li>
+			<li><a href='../refund/refundOut.jsp'><span
+					class="glyphicon glyphicon-refresh"></span> 환불내역</a></li>
+		</ul>
+	</div>
+	<!-- 회원 정보 수정 폼 -->
+	<br>
+	<div class="sign_form container">
+		<h1 class="name">회원정보</h1>
+		<br>
+		<div class='container'>
+			<c:choose>
+				<c:when test='${!empty param.msgId}'>
+					<jsp:include page='msg.jsp' />
+				</c:when>
+			</c:choose>
+		</div>
+		<br>
+		<form class="form-horizontal" action="userModProc.jsp" method="post"
+			name="userInfo">
+			<div class="form-group">
+				<label class="col-sm-4 control-label">성명: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name="userName" type="text"
+						value="<%=user.getUserName()%>" maxlength="8">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">아이디: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name="userId" type="text"
+						value="<%=user.getUserId()%>" maxlength="16" disabled>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">성별 : </label>
+				<div class="col-sm-4">
+					<input class="form-control" name='gender' type='text'
+						value="<%=user.getGender()%>" maxlength='16' disabled>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">생년월일: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name='userDate' type='text'
+						value="<%=bday%>" disabled>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">전화번호 : </label>
+				<div class="col-sm-4">
+					<input class="form-control" name='userTel' type='tel'
+						value="<%=user.getPhoneNum()%>">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">이메일: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name='userEmail' type='email'
+						value="<%=user.getEmail()%>">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">비밀번호: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name='userPwd' type='password'
+						placeholder='현재 비밀번호' maxlength='16'>
+				</div>
+				<div>
+					<button class="sign_btn btn btn-primary" type="submit"
+						formaction="pwCheck.jsp">비밀번호 변경</button>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">비밀번호 질문: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name="pwQ" type='email'
+						value="당신의 보물 제 1호는?" disabled>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">비밀번호 답: </label>
+				<div class="col-sm-4">
+					<input class="form-control" name='pwA' type='text'
+						value="<%=user.getAnswer()%>">
+				</div>
+			</div>
+
+		</form>
+	</div>
+	<br>
+	<br>
+	<div class="container">
+		<label class="col-sm-5 control-label"></label>
+		<div class="col-sm-4">
+			<button class="sign_btn btn btn-success" type="submit"
+				onclick="alert_correct()">수정하기</button>
+			<button class="sign_btn btn btn-danger" type="submit"
+				onclick="alert_secede()">탈퇴하기</button>
+		</div>
+	</div>
+	<div class=footer>
+		<hr>
+		<p class='footertext'>
+			대표이사 이 현 | 대표 전화 02 – 0000 – 0000<br> 본사 서울시 마포구 서교동 | 주소 서울시
+			마포구 서교동<br> 고객센터 02 – 1234 - 1234
+		</p>
+	</div>
+</body>
+</html>
